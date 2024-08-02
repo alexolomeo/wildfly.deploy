@@ -1,0 +1,116 @@
+argument_specs:
+    main:
+        options:
+            # line 2 of defaults/main.yml
+            gazellacom_builder_host:
+                default: "localhost"
+                description: "TODO document argument"
+                type: "str"
+
+            # line 3 of defaults/main.yml
+            gazellacom_build_app:
+                default: true
+                description: "TODO document argument"
+                type: "bool"
+
+            # line 4 of defaults/main.yml
+            gazellacom_build_delete_workdir:
+                default: true
+                description: "TODO document argument"
+                type: "bool"
+
+            # line 5 of defaults/main.yml
+            gazellacom_build_shell_interpreter:
+                default: "/bin/bash"
+                description: "TODO document argument"
+                type: "str"
+
+            # line 6 of defaults/main.yml
+            gazellacom_build_relative_path_to_deploy_dir:
+                default: "target/quarkus-app/"
+                description: "TODO document argument"
+                type: "str"
+
+            # line 7 of defaults/main.yml
+            gazellacom_java_package_version:
+                default: "java-17-openjdk"
+                description: "TODO document argument"
+                type: "str"
+
+            # line 8 of defaults/main.yml
+            gazellacom_java_home:
+                default: "/usr/lib/jvm/jre-17-openjdk"
+                description: "TODO document argument"
+                type: "str"
+
+            # line 10 of defaults/main.yml
+            gazellacom_app_workdir:
+                default: "/tmp/workdir"
+                description: "TODO document argument"
+                type: "str"
+
+            # line 11 of defaults/main.yml
+            gazellacom_app_user:
+                default: "gazellacom_app"
+                description: "TODO document argument"
+                type: "str"
+
+            # line 12 of defaults/main.yml
+            gazellacom_app_group:
+                default: "{{ gazellacom_app_user }}"
+                description: "TODO document argument"
+                type: "str"
+
+            # line 14 of defaults/main.yml
+            gazellacom_app_service_name:
+                default: "{{ app_name }}"
+                description: "TODO document argument"
+                type: "str"
+
+            # line 15 of defaults/main.yml
+            gazellacom_deploy_systemd_service_conf:
+                default: "/etc/{{ app_name }}.conf"
+                description: "TODO document argument"
+                type: "str"
+
+            # line 16 of defaults/main.yml
+            gazellacom_app_validation_host:
+                default: "localhost"
+                description: "TODO document argument"
+                type: "str"
+
+            # line 17 of defaults/main.yml
+            gazellacom_systemd_service_template:
+                default: "templates/service_systemd.j2"
+                description: "TODO document argument"
+                type: "str"
+
+            # line 18 of defaults/main.yml
+            gazellacom_systemd_home:
+                default: "/usr/lib/systemd/system"
+                description: "TODO document argument"
+                type: "str"
+
+            # line 20 of defaults/main.yml
+            gazellacom_app_port:
+                default: 8080
+                description: "TODO document argument"
+                type: "int"
+
+            # line 21 of defaults/main.yml
+            gazellacom_app_port_firewalld:
+                default: "{{ gazellacom_app_port }}"
+                description: "TODO document argument"
+                type: "str"
+
+            # line 22 of defaults/main.yml
+            gazellacom_app_firewalld_enabled:
+                default: false
+                description: "TODO document argument"
+                type: "bool"
+
+            # line 23 of defaults/main.yml
+            gazellacom_firewalld_package:
+                default: "firewalld"
+                description: "TODO document argument"
+                type: "str"

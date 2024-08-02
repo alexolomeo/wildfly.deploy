@@ -1,0 +1,43 @@
+---
+- block:
+    - name: "Deploy application from  to target system"
+      ansible.builtin.copy:
+        src: "{{ gazellacom_app_src_dir }}"
+        dest: "{{ gazellacom_path_to_folder_to_deploy }}"
+        owner: "{{ gazellacom_app_user | default(omit) }}"
+        group: "{{ gazellacom_app_group | default(omit) }}"
+        remote_src: true
+        mode: 0755
+      changed_when: false
+
+    - name: "Deploy Systemd configuration for Quarkus app"
+      ansible.builtin.template:
+        src: "{{ gazellacom_systemd_service_template }}"
+        dest: "{{ gazellacom_systemd_home }}/{{ gazellacom_app_service_name }}.service"
+        owner: "{{ gazellacom_app_user | default(omit) }}"
+        group: "{{ gazellacom_app_group | default(omit) }}"
+        mode: 0640
+      register: gazellacom_deploy_systemd_service_conf
+      vars:
+        service_user: "{{ gazellacom_app_user | default(omit) }}"
+        service_group: "{{ gazellacom_app_group | default(omit) }}"
+      when:
+        - gazellacom_app_service_name is defined
+
+    - name: "Perform daemon-reload to ensure the changes are picked up"
+      ansible.builtin.systemd:
+        daemon_reload: true
+      when:
+        - gazellacom_app_service_name is defined
+        - gazellacom_deploy_systemd_service_conf is defined
+        - gazellacom_deploy_systemd_service_conf.changed is defined
+        - gazellacom_deploy_systemd_service_conf.changed
+
+    - name: "Ensure Quarkus app service is running."
+      ansible.builtin.service:
+        name: "{{ gazellacom_app_service_name }}"
+        state: started
+        enabled: true
+      when:
+        - gazellacom_app_service_name is defined
+  become: true

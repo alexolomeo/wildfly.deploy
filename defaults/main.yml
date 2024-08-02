@@ -1,0 +1,24 @@
+---
+gazellacom_builder_host: localhost
+gazellacom_build_app: true
+gazellacom_build_delete_workdir: false
+gazellacom_build_shell_interpreter: /bin/bash
+gazellacom_build_relative_path_to_deploy_dir: target/gazellacom/
+gazellacom_java_package_version: 'java-17-openjdk'
+gazellacom_java_home: '/usr/lib/jvm/'
+
+gazellacom_app_workdir: '/tmp/workdir'
+gazellacom_app_user: gazellacom_app
+gazellacom_app_group: "{{ gazellacom_app_user }}"
+
+gazellacom_app_service_name: "{{ app_name }}"
+gazellacom_deploy_systemd_service_conf: "/etc/{{ app_name }}.conf"
+gazellacom_app_validation_host: localhost
+gazellacom_systemd_service_template: 'templates/service_systemd.j2'
+gazellacom_systemd_home: '/usr/lib/systemd/system'
+
+gazellacom_app_port: 8080
+gazellacom_app_port_firewalld: "{{ gazellacom_app_port }}"
+gazellacom_app_firewalld_enabled: false
+gazellacom_firewalld_package: firewalld
+

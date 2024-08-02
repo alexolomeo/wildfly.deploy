@@ -1,0 +1,24 @@
+galaxy_info:
+  role_name: wildfly.deploy
+  namespace: middleware_automation
+  author: Alexander Aguilar Torrico
+  description: build  and deploy ...
+  company: SwissTech Solutions.
+
+  license: Apache License 2.0
+
+  min_ansible_version: "2.9"
+
+  platforms:
+   - name: EL
+     versions:
+     - 8
+     - 9
+
+  galaxy_tags:
+    - quarkus
+    - redhat
+    - rhel
+    - tools
+    - application
+    - java

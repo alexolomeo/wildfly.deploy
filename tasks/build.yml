@@ -1,0 +1,68 @@
+---
+#- name: "Ensure required parameters are provided."
+#  ansible.builtin.assert:
+#    that:
+#      - gazellacom_builder_host is defined
+#      - gazellacom_app_repo_url is defined
+#      - gazellacom_app_workdir is defined
+#    quiet: true
+
+- name: "Define path to mvnw script."
+  ansible.builtin.set_fact:
+    path_to_mvnw: "{{ gazellacom_app_workdir }}/{{ gazellacom_app_source_folder | default('') }}/mvnw"
+
+- name: "Build app from {{ gazellacom_app_repo_url }} on '{{ gazellacom_builder_host }}'."
+  delegate_to: "{{ gazellacom_builder_host }}"
+  block:
+    - name: "Ensure that builder host {{ gazellacom_builder_host }} has appropriate JDK installed: {{ gazellacom_java_package_version }}"
+      ansible.builtin.package:
+        name: "{{ gazellacom_java_package_version }}"
+        state: present
+      become: true
+      when:
+        - gazellacom_java_package_version is defined and gazellacom_java_package_version | length > 0
+
+    - name: "Delete previous workdir (if requested)."
+      ansible.builtin.file:
+        path: "{{ gazellacom_app_workdir }}"
+        state: absent
+      changed_when: false
+      when:
+        - gazellacom_build_delete_workdir is defined
+        - gazellacom_build_delete_workdir
+
+    - name: "Ensure app workdir exists: {{ gazellacom_app_workdir }}"
+      ansible.builtin.file:
+        path: "{{ gazellacom_app_workdir }}"
+        owner: "{{ gazellacom_app_builder_user | default(omit) }}"
+        group: "{{ gazellacom_app_builder_group | default(omit) }}"
+        mode: 0755
+        state: directory
+
+    - name: "Checkout the application source code."
+      ansible.builtin.git:
+        repo: "{{ gazellacom_app_repo_url }}"
+        dest: "{{ gazellacom_app_workdir }}"
+        owner: "{{ gazellacom_app_builder_user | default(omit) }}"
+        group: "{{ gazellacom_app_builder_group | default(omit) }}"
+        version: "{{ app_tag | default(omit) }}"
+
+#    - name: "Ensure {{ gazellacom_app_workdir }}/{{ gazellacom_app_source_folder | default('') }}/mvnw"
+#      ansible.builtin.command: "/usr/bin/dos2unix {{ gazellacom_app_workdir }}/{{ gazellacom_app_source_folder | default('') }}/mvnw"
+#      when:
+#        - gazellacom_apply_dos2unix_to_mvnw is defined and gazellacom_apply_dos2unix_to_mvnw
+
+    - name: "Build the App using Maven"
+      ansible.builtin.command: "{{ gazellacom_build_shell_interpreter }} ./mvnw package"
+      register: mvn_build
+      environment:
+        JAVA_HOME: "{{ gazellacom_java_home }}"
+      args:
+        chdir: "{{ gazellacom_app_workdir }}/{{ gazellacom_app_source_folder | default('') }}"
+      changed_when: false
+
+    - name: "Display build application log"
+      ansible.builtin.debug:
+        var: mvn_build.stdout
+      when:
+        - display_mvn_output is defined

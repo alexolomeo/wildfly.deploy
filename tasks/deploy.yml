@@ -1,0 +1,38 @@
+---
+- name: "Ensure required parameters are provided."
+  ansible.builtin.assert:
+    that:
+      - gazellacom_app_workdir is defined
+      - gazellacom_path_to_folder_to_deploy is defined
+      - app_name is defined
+    quiet: true
+
+- name: "Ensure requirements on target system are fullfilled."
+  ansible.builtin.include_tasks: deploy/prereqs.yml
+
+- name: "Ensure deployement directory exits: {{ gazellacom_path_to_folder_to_deploy }}."
+  ansible.builtin.file:
+    path: "{{ gazellacom_path_to_folder_to_deploy }}"
+    state: directory
+    owner: "{{ gazellacom_app_user | default(omit) }}"
+    group: "{{ gazellacom_app_group | default(omit) }}"
+    mode: 0755
+
+- name: "Set Quarkus app source dir (if not defined)."
+  ansible.builtin.set_fact:
+    gazellacom_app_src_dir: "{{ gazellacom_app_workdir }}/{{ gazellacom_app_source_folder | default('') }}/{{ gazellacom_build_relative_path_to_deploy_dir }}/"
+  when:
+    - not gazellacom_app_src_dir is defined
+
+- name: "Deploy application as a systemd service on target system."
+  ansible.builtin.include_tasks: deploy/service.yml
+
+- name: "Ensure firewalld configuration is appropriate (if requested)."
+  ansible.builtin.include_tasks: deploy/firewalld.yml
+  when:
+    - gazellacom_app_firewalld_enabled is defined and gazellacom_app_firewalld_enabled
+
+- name: "Verify that deployment is functional."
+  ansible.builtin.include_tasks: validate_deployment.yml
+  when:
+    - gazellacom_app_validate_deployment is defined and gazellacom_app_validate_deployment

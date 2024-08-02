@@ -1,0 +1,5 @@
+---
+- name: "Build app (if requested)."
+  ansible.builtin.include_tasks: build.yml
+  when:
+    - gazellacom_build_app is defined and gazellacom_build_app
